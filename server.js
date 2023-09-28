@@ -5,7 +5,8 @@ const Connection = require('./connection/connection');
 
  
 //creating the variable questions and having the prompts appear in the console
- 
+
+
 const questions = () => {
     inquirer.prompt([
         {
@@ -26,7 +27,7 @@ const questions = () => {
     //the then statement will determine what happens next after the user selects one of the previous options
     .then((data) => {
         if (data.selection === 'view all departments') {
-            db.query(`SELECT * FROM department`, (err, result) => {
+            Connection.query(`SELECT * FROM department`, (err, result) => {
                 if (err) {
                     console.log(err);
                 }
@@ -35,7 +36,7 @@ const questions = () => {
         }
         // if the user selects the view all roles option, it will pull from the role section in the query database
         if (data.selection === 'view all roles') {
-            db.query(`SELECT * FROM role`, (err, result) => {
+            Connection.query(`SELECT * FROM role`, (err, result) => {
             if (err) {
                 console.log(err);
             }
@@ -44,7 +45,7 @@ const questions = () => {
         }
         // if the user selects the view all employees option, it will pull from the employee section in the query database
         if (data.selection === 'view all employees') {
-            db.query(`SELECT * FROM employee`, (err, result) => {
+            Connection.query(`SELECT * FROM employee`, (err, result) => {
             if (err) {
                 console.log(err);
             }
@@ -55,20 +56,21 @@ const questions = () => {
             // we need to add a blank array in an insert into property in the schema.sql? where they can add a department and that info will be saved as another department in the selection
             inquirer.prompt([
                 {
-                    name: "department name",
+                    name: "department",
                     message: "what is the name of the department?"
                 }
             ])
             // new department will be added into the department table
             .then((response) => {
+                console.log(response);
                 Connection
-                    .promise()
+                .promise()
                     .query(
-                        "INSERT INTO department SET ?",
-                        response,
+                        "INSERT INTO department (name) SET ?",
+                        [response.department]
                     )
                 console.log(`Department ${response.name} has been added.`)
-                mainMenu();
+                questions();
             })
         }
         // new role will be added into the role table
@@ -85,9 +87,9 @@ const questions = () => {
                 Connection
                 .promise()
                 .query("INSERT INTO role SET ?", response,
-                {   title: answer.roleName,
-                    salary: answer.roleSalary,
-                    department_id: answer.roleDepartment_Id,
+                {   title: "response.roleName",
+                    salary: "response.roleSalary",
+                    department_id: "response.roleDepartment_id",
                 },
 
                 function(err, results,) 
@@ -96,7 +98,7 @@ const questions = () => {
                 }
             )
                 console.log(`Role ${response.name} has been added.`)
-                mainMenu();
+                questions();
             })
         }
         if (data.selection === 'add an employee') {
@@ -113,7 +115,7 @@ const questions = () => {
                 .promise()
                 .query("INSERT INTO role SET ?", response,)
                 console.log(`Role ${response.name} has been added.`)
-                mainMenu();
+                questions();
             });
         }
     });
