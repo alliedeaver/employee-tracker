@@ -1,19 +1,8 @@
 //defining and calling our dependencies
  
-const mysql = require('mysql2');
 const inquirer = require('inquirer');
-// const {Connection} = require('mysql2/typings/mysql/lib/Connection');
- 
-//connecting mysql to the database
-const db = mysql.createConnection(
-    {
-        host: '127.0.0.1',
-        user: 'root',
-        password: '',
-        database: 'tracker_db'
-    },
-    console.log(`Connected to the tracker database.`)
-);
+const Connection = require('./connection/connection');
+
  
 //creating the variable questions and having the prompts appear in the console
  
@@ -80,7 +69,7 @@ const questions = () => {
                     )
                 console.log(`Department ${response.name} has been added.`)
                 mainMenu();
-            });
+            })
         }
         // new role will be added into the role table
         if (data.selection === 'add a role') {
@@ -95,12 +84,22 @@ const questions = () => {
             .then((response) => {
                 Connection
                 .promise()
-                .query("INSERT INTO role SET ?", response,)
+                .query("INSERT INTO role SET ?", response,
+                {   title: answer.roleName,
+                    salary: answer.roleSalary,
+                    department_id: answer.roleDepartment_Id,
+                },
+
+                function(err, results,) 
+                {
+                console.log(results);
+                }
+            )
                 console.log(`Role ${response.name} has been added.`)
                 mainMenu();
             })
         }
-        if (data.selection === 'add a role') {
+        if (data.selection === 'add an employee') {
             inquirer.prompt([
                 {
                     name: "role name",
